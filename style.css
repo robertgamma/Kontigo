@@ -1,0 +1,91 @@
+:root {
+    --bg-main: #020617;
+    --bg-card: rgba(15, 23, 42, 0.5);
+    --border-card: rgba(255, 255, 255, 0.05);
+    --accent-blue: #3b82f6;
+    --accent-emerald: #10b981;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+/* Glassmorphism */
+.glass-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-card);
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-blue);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Specialized UI Elements */
+input:focus, select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Charts Tooltip Customization */
+#chartjs-tooltip {
+    background: rgba(15, 23, 42, 0.9) !important;
+    backdrop-filter: blur(4px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 0.5rem !important;
+    padding: 8px !important;
+}
+
+/* Transaction List States */
+.type-ingreso { color: var(--accent-blue); }
+.type-carga { color: var(--accent-emerald); }
+.type-gasto { color: #ef4444; }
+
+/* Pulse effect for balance if growth is positive */
+.pulse-green {
+    animation: pulseG 2s infinite;
+}
+
+@keyframes pulseG {
+    0% { text-shadow: 0 0 0 rgba(16, 185, 129, 0); }
+    50% { text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+    100% { text-shadow: 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* Responsive Tweaks */
+@media (max-width: 768px) {
+    .glass-card {
+        border-radius: 1rem;
+        padding: 1rem !important;
+    }
+}
