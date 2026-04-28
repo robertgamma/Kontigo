@@ -18,7 +18,10 @@
     <header class="p-6 flex justify-between items-center border-b border-white/5 backdrop-blur-md sticky top-0 z-40 bg-[#020617]/80">
         <div>
             <h1 class="text-2xl font-black bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">Kontigo Tracker</h1>
-            <p class="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500">v1.0.0 · Premium Financial Suite</p>
+            <div class="flex items-center gap-2">
+                <p class="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500">v1.0.0 · Premium Finance</p>
+                <span id="rate-source" class="text-[8px] font-black px-1.5 py-0.5 rounded bg-slate-800 text-slate-600 uppercase">Tasa Manual</span>
+            </div>
         </div>
         <div class="flex gap-2">
             <button onclick="openBackupModal()" class="p-3 glass-card text-emerald-400 hover:bg-emerald-500/10 transition-all">
@@ -31,6 +34,29 @@
     </header>
 
     <main class="flex-grow p-4 md:p-8 max-w-7xl mx-auto w-full space-y-8">
+
+        <!-- MANUAL SYNC SECTION -->
+        <section class="glass-card p-6 border-emerald-500/30">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                    <h3 class="font-black text-xl text-emerald-400">Sincronizar con APK</h3>
+                    <p class="text-xs text-slate-500">Ingresa los montos exactos que muestra tu aplicación Kontigo</p>
+                </div>
+                <div class="flex flex-wrap gap-4 w-full md:w-auto">
+                    <div class="flex-grow md:flex-grow-0">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Saldo Kontigo (VES)</label>
+                        <input type="number" id="manual-ves" placeholder="Bs. 0.00" class="w-full md:w-40 bg-slate-800/50 border border-white/10 rounded-lg p-2 font-black text-sm text-emerald-400 focus:border-emerald-500/50">
+                    </div>
+                    <div class="flex-grow md:flex-grow-0">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Saldo Kontigo (USD)</label>
+                        <input type="number" id="manual-usd" placeholder="$ 0.00" class="w-full md:w-32 bg-slate-800/50 border border-white/10 rounded-lg p-2 font-black text-sm text-emerald-400 focus:border-emerald-500/50">
+                    </div>
+                    <button onclick="saveManualBalance()" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-black px-6 py-2 rounded-lg transition-all flex items-center justify-center gap-2 self-end">
+                        <i class="fas fa-check"></i> Actualizar
+                    </button>
+                </div>
+            </div>
+        </section>
         
         <!-- TOP METRICS -->
         <section id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -43,9 +69,10 @@
             </div>
             
             <div class="glass-card p-6 border-emerald-500/20">
-                <p class="text-xs font-bold text-slate-500 uppercase mb-2">Disponible Kontigo (USD)</p>
+                <p class="text-xs font-bold text-slate-500 uppercase mb-2">Estado en Kontigo</p>
                 <h3 id="stat-kontigo-balance" class="text-3xl font-black text-emerald-400">$ 0.00</h3>
-                <p class="text-[10px] text-slate-500 mt-2"><i class="fas fa-info-circle"></i> Neto sin comisiones</p>
+                <p id="stat-kontigo-ves" class="text-xs font-bold text-slate-400 mt-1">Bs. 0.00</p>
+                <p class="text-[10px] text-slate-500 mt-2"><i class="fas fa-info-circle"></i> Sincronizado con APK</p>
             </div>
 
             <div class="glass-card p-6">
@@ -55,7 +82,7 @@
             </div>
 
             <div class="glass-card p-6">
-                <p class="text-xs font-bold text-slate-500 uppercase mb-2">Eficiencia de Inversión</p>
+                <p class="text-xs font-bold text-slate-500 uppercase mb-2">Rendimiento (ROI)</p>
                 <h3 id="stat-efficiency" class="text-3xl font-black text-amber-400">0.0%</h3>
                 <div class="mt-2 w-full bg-slate-800 h-1 rounded-full overflow-hidden">
                     <div id="efficiency-bar" class="bg-amber-400 h-full transition-all duration-1000" style="width: 0%"></div>
@@ -67,7 +94,7 @@
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 glass-card p-6">
                 <div class="flex justify-between items-center mb-6">
-                    <h3 class="font-black text-xl">Crecimiento VES en Kontigo (USD)</h3>
+                    <h3 class="font-black text-xl text-blue-400">Rendimiento Porcentual Diario</h3>
                     <select id="chart-period" class="bg-slate-800 border-none text-xs font-bold rounded-lg px-3 py-1 text-slate-400">
                         <option value="30">Últimos 30 días</option>
                         <option value="90">90 días</option>
@@ -99,8 +126,13 @@
                             <select id="tx-type" class="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 font-bold text-sm focus:border-blue-500/50 transition-all">
                                 <option value="ingreso">Ingreso (Bolívares)</option>
                                 <option value="carga">Carga a Kontigo (VES -> USD)</option>
-                                <option value="gasto">Gasto / Retiro (Bolívares)</option>
+                                <option value="retiro">Retiro / Pago Móvil (Bolívares)</option>
+                                <option value="gasto">Gasto / Otros (Bolívares)</option>
                             </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Fecha del Movimiento</label>
+                            <input type="date" id="tx-date" class="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 text-sm focus:border-blue-500/50 transition-all">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Monto (VES)</label>
@@ -121,12 +153,17 @@
                 </div>
 
                 <div class="glass-card p-6">
-                    <h3 class="font-black text-lg mb-4">Resumen Mensual</h3>
-                    <div id="monthly-summary" class="space-y-3">
-                        <!-- Monthly list will be injected here -->
-                        <div class="flex items-center justify-center py-10 opacity-30">
-                            <i class="fas fa-folder-open text-3xl"></i>
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-black text-lg">Reportes de Cortes</h3>
+                        <div class="flex gap-1 bg-slate-900 p-1 rounded-lg">
+                            <button onclick="switchReportTab('monthly')" id="rpt-btn-monthly" class="px-3 py-1 text-[10px] font-bold rounded-md bg-blue-600 text-white transition-all">Mes</button>
+                            <button onclick="switchReportTab('quarterly')" id="rpt-btn-quarterly" class="px-3 py-1 text-[10px] font-bold rounded-md text-slate-500 hover:bg-white/5 transition-all">Trimestre</button>
+                            <button onclick="switchReportTab('annual')" id="rpt-btn-annual" class="px-3 py-1 text-[10px] font-bold rounded-md text-slate-500 hover:bg-white/5 transition-all">Año</button>
                         </div>
+                    </div>
+                    <div id="period-summary" class="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+                        <!-- Periodic reports will be injected here -->
+                        <div class="text-center py-10 opacity-30 text-xs">Cargando reportes...</div>
                     </div>
                 </div>
             </div>
@@ -197,6 +234,14 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Comisión de Salida (Off-ramp %)</label>
                     <input type="number" id="cfg-fee-exit" step="0.1" class="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 font-bold">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Organization ID (Kontigo)</label>
+                    <input type="text" id="cfg-org-id" class="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 font-bold" placeholder="org_...">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-2">API Key (Kontigo)</label>
+                    <input type="password" id="cfg-api-key" class="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 font-bold" placeholder="kontigo_...">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Meta Mensual (VES)</label>

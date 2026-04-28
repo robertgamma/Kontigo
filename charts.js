@@ -10,7 +10,7 @@ function initCharts() {
             data: {
                 labels: [],
                 datasets: [{
-                    label: 'Balance Kontigo (USD)',
+                    label: 'Rendimiento (%)',
                     data: [],
                     borderColor: '#3b82f6',
                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -31,12 +31,22 @@ function initCharts() {
                         intersect: false,
                         backgroundColor: 'rgba(15, 23, 42, 0.9)',
                         titleFont: { family: 'Outfit', weight: 'bold' },
-                        bodyFont: { family: 'Outfit' }
+                        bodyFont: { family: 'Outfit' },
+                        callbacks: {
+                            label: (ctx) => `Rendimiento: ${ctx.raw.toFixed(2)}%`
+                        }
                     }
                 },
                 scales: {
                     x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
-                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b', font: { size: 10 } } }
+                    y: { 
+                        grid: { color: 'rgba(255,255,255,0.05)' }, 
+                        ticks: { 
+                            color: '#64748b', 
+                            font: { size: 10 },
+                            callback: (val) => val + '%'
+                        } 
+                    }
                 }
             }
         });
@@ -75,11 +85,9 @@ function initCharts() {
 function updateCharts(history) {
     if (!growthChart || !variationChart) return;
 
-    // Process growth data
-    // Group by day to avoid clutter
     const dailyData = {};
     history.forEach(h => {
-        dailyData[h.date] = h.usd;
+        dailyData[h.date] = h.pct; // Use pct instead of usd
     });
 
     const labels = Object.keys(dailyData).sort();
@@ -89,13 +97,12 @@ function updateCharts(history) {
     growthChart.data.datasets[0].data = data;
     growthChart.update();
 
-    // Process variation data
+    // Process variation data (delta between days)
     const variations = [];
     for (let i = 1; i < data.length; i++) {
         const prev = data[i-1];
         const curr = data[i];
-        const varPct = prev > 0 ? ((curr - prev) / prev) * 100 : 0;
-        variations.push(varPct);
+        variations.push(curr - prev);
     }
 
     variationChart.data.labels = labels.slice(1);
